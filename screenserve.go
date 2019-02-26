@@ -2,74 +2,84 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"log"
+	"os"
 	"os/exec"
 	"time"
 )
 
 var subProc *exec.Cmd
+var ctx context.Context
+var cancel context.CancelFunc
+var cmd string
+
+type instruction struct {
+	instruction string
+	parameter   string
+}
 
 func main() {
-	var channel = make(chan string)
+	if len(os.Args) <= 1 {
+		log.Fatal("Provide a command")
+	}
+	cmd = os.Args[1]
+	log.Printf("Command is '%v'", cmd)
 
+	var channel = make(chan instruction)
 	go controller(channel)
 
-	channel <- "start"
+	channel <- instruction{"start", "3600"}
 
-	time.AfterFunc(1*time.Second, func() {
-		channel <- "stop"
-	})
+	// time.AfterFunc(1*time.Second, func() {
+	// 	channel <- instruction{"stop", ""}
+	// })
 	time.AfterFunc(2*time.Second, func() {
-		channel <- "start"
+		channel <- instruction{"start", "3600"}
 	})
 	time.AfterFunc(4*time.Second, func() {
-		channel <- "stop"
+		channel <- instruction{"stop", ""}
 	})
 
 	for {
-		fmt.Print(".")
+		//fmt.Print(".")
 		time.Sleep(200 * time.Millisecond)
 	}
 }
 
-var stdout io.ReadCloser
-var ctx context.Context
-var cancel context.CancelFunc
+func act(action instruction) {
+	log.Printf("Action: %v", action)
 
-func act(action string) {
-	fmt.Print("action: ", action)
-	var err1 error
-
-	switch action {
+	switch action.instruction {
 	case "start":
-		ctx, cancel = context.WithCancel(context.Background())
-		subProc = exec.CommandContext(ctx, "bash", "-c", "while true; do echo -n 'parp'; sleep 0.2; done")
-		defer cancel()
-		if stdout, err1 = subProc.StdoutPipe(); err1 != nil {
-			log.Fatal(err1)
-		}
-
-		if err := subProc.Start(); err != nil {
-			log.Fatal(err)
-		}
-		fmt.Print("started")
+		// Start the subprocess
+		log.Print("Starting")
+		startSubprocess(action.parameter)
+		log.Print("Started")
 	case "stop":
-		fmt.Print("stopping")
-
-		buffer := make([]byte, 100)
-		fmt.Print(string(buffer))
-		stdout.Read(buffer)
-		stdout.Close()
-		cancel()
-		err := subProc.Wait()
-		log.Printf("Command finished with error: %v", err)
-		fmt.Print("stopped")
+		// Stop the subprocess
+		log.Print("Stopping")
+		stopSubprocess()
+		log.Print("Stopped")
 	}
 }
 
-func controller(c chan string) {
+func startSubprocess(parameter string) {
+	ctx, cancel = context.WithCancel(context.Background())
+	log.Printf("Running '%v %v'", cmd, parameter)
+	subProc = exec.CommandContext(ctx, cmd, parameter)
+	defer cancel()
+
+	if err := subProc.Start(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func stopSubprocess() {
+	cancel()
+	subProc.Wait() // we don't care about subprocess errors for now
+}
+
+func controller(c chan instruction) {
 	for {
 		action := <-c
 		act(action)
