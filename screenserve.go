@@ -1,32 +1,61 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
 	"os"
-	"time"
 
-	subprocess "github.com/mozz100/screenserve/subprocess"
+	"github.com/mozz100/screenserve/subprocess"
 )
 
 func main() {
-	if len(os.Args) <= 1 {
-		log.Fatal("Provide a command")
+	if len(os.Args) <= 2 {
+		log.Fatal("Provide a port and a command")
 	}
-	cmd := os.Args[1]
+	port := os.Args[1]
+	cmd := os.Args[2]
 	log.Printf("Command is '%v'", cmd)
 
-	ch := *subprocess.Subprocess(cmd)
-	log.Print(ch)
+	sbpctx := subprocess.Context{}
+	ch := *subprocess.Subprocess(cmd, &sbpctx)
 
-	ch <- subprocess.Instruction{
-		Instruction: "start",
-		Parameter:   "3600",
+	launchHandler := func(w http.ResponseWriter, r *http.Request) {
+		param := r.FormValue("param")
+		log.Printf("Launch page with param = '%v'\n", param)
+		if sbpctx.SubProc != nil || param == "" {
+			ch <- subprocess.Instruction{
+				Instruction: "stop",
+				Parameter:   "",
+			}
+		}
+		if param != "" {
+			ch <- subprocess.Instruction{
+				Instruction: "start",
+				Parameter:   param,
+			}
+		}
+
+		log.Println("Redirecting to home page")
+		http.Redirect(w, r, "/", http.StatusFound)
 	}
 
-	time.Sleep(time.Second * 10)
-	ch <- subprocess.Instruction{
-		Instruction: "stop",
-		Parameter:   "",
+	homeHandler := func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `
+		<html>
+			<head></head>
+			<body>
+				<form method='POST' action='/launch/'>
+					<input name='param' type='text' />
+					<input type='submit'/>
+				</form>
+			</body>
+		</html>`)
+		log.Println("Responded with home page")
 	}
-	time.Sleep(time.Second * 10)
+
+	http.HandleFunc("/launch/", launchHandler)
+	http.HandleFunc("/", homeHandler)
+	log.Printf("Starting listening on port %v\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
