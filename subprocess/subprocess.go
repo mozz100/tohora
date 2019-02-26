@@ -48,7 +48,6 @@ func startSubprocess(cmd string, Parameter string, sbpctx *Context) {
 	sbpctx.Ctx, sbpctx.Cancel = context.WithCancel(context.Background())
 	log.Printf("Running '%v %v'", cmd, Parameter)
 	sbpctx.SubProc = exec.CommandContext(sbpctx.Ctx, cmd, Parameter)
-	defer sbpctx.Cancel()
 
 	if err := sbpctx.SubProc.Start(); err != nil {
 		log.Fatal(err)
