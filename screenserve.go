@@ -21,23 +21,39 @@ func main() {
 	ch := *subprocess.Subprocess(cmd, &sbpctx)
 
 	launchHandler := func(w http.ResponseWriter, r *http.Request) {
-		param := r.FormValue("param")
-		log.Printf("Launch page with param = '%v'\n", param)
-		if sbpctx.SubProc != nil || param == "" {
+		var desiredURL string
+		var slackAPI bool
+
+		r.ParseForm()
+		if url, ok := r.PostForm["url"]; ok {
+			desiredURL = url[0]
+		}
+		if url, ok := r.PostForm["text"]; ok {
+			desiredURL = url[0]
+			slackAPI = true
+		}
+
+		log.Printf("Launch page with desiredURL = '%v'. Slack: %v\n", desiredURL, slackAPI)
+		if sbpctx.SubProc != nil || desiredURL == "" {
 			ch <- subprocess.Instruction{
 				Instruction: "stop",
 				Parameter:   "",
 			}
 		}
-		if param != "" {
+		if desiredURL != "" {
 			ch <- subprocess.Instruction{
 				Instruction: "start",
-				Parameter:   param,
+				Parameter:   desiredURL,
 			}
 		}
 
-		log.Println("Redirecting to home page")
-		http.Redirect(w, r, "/", http.StatusFound)
+		if slackAPI {
+			log.Println("Responding with plain text 200")
+			fmt.Fprint(w, "OK :tv: :eyes:")
+		} else {
+			log.Println("Redirecting to home page")
+			http.Redirect(w, r, "/", http.StatusFound)
+		}
 	}
 
 	homeHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +62,7 @@ func main() {
 			<head></head>
 			<body>
 				<form method='POST' action='/launch/'>
-					<input name='param' type='text' />
+					<input name='url' type='text' />
 					<input type='submit'/>
 				</form>
 			</body>
