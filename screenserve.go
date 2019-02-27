@@ -58,14 +58,31 @@ func main() {
 
 	homeHandler := func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, `
-		<html>
-			<head></head>
-			<body>
+		<!doctype html>
+		<html lang="en">
+		<head>
+			<!-- Required meta tags -->
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+			
+			<!-- Bootstrap CSS -->
+			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+			
+			<title>Wall-e</title>
+		</head>
+		<body>
+			<div class="container">
+				<p>Put in a URL to fling it to Wall-e</p>
 				<form method='POST' action='/launch/'>
-					<input name='url' type='text' />
-					<input type='submit'/>
+					<div class="form-group">
+						<input class="form-control" autofocus="autofocus" name="url" type="url" />
+						<small class="form-text text-muted">Include 'http' or 'https'</small>
+					</div>
+					
+					<button class="btn btn-primary" type='submit'>Go</button>
 				</form>
-			</body>
+			</div>
+		</body>
 		</html>`)
 		log.Println("Responded with home page")
 	}
