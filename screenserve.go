@@ -17,7 +17,7 @@ func main() {
 	cmd := os.Args[2]
 	log.Printf("Command is '%v'", cmd)
 
-	sbpctx := subprocess.Subprocess(cmd)
+	sbpctx := subprocess.GetSubprocess(cmd)
 
 	launchHandler := func(w http.ResponseWriter, r *http.Request) {
 		var desiredURL string
@@ -31,13 +31,16 @@ func main() {
 			desiredURL = url[0]
 			slackAPI = true
 		}
+		if clear, ok := r.PostForm["clear"]; ok && clear[0] == "1" {
+			desiredURL = ""
+		}
 
 		log.Printf("Launch page with desiredURL = '%v'. Slack: %v\n", desiredURL, slackAPI)
-		if sbpctx.SubProc != nil || desiredURL == "" {
-			sbpctx.Channel <- ""
+		if sbpctx.Parameter != "" || desiredURL == "" {
+			sbpctx.Stop()
 		}
 		if desiredURL != "" {
-			sbpctx.Channel <- desiredURL
+			sbpctx.StartWith(desiredURL)
 		}
 
 		if slackAPI {
@@ -68,20 +71,21 @@ func main() {
 			<title>Wall-e</title>
 		</head>
 		<body>
-			<div class="container">
-				<p>Put in a URL to fling it to Wall-e</p>
+			<div class="container mt-3">
 				<p class="%v">Currently showing: <code>%v</code></p>
 				<form method='POST' action='/launch/'>
 					<div class="form-group">
-						<input class="form-control" autofocus="autofocus" name="url" type="url" />
+						<input class="form-control" autofocus="autofocus" placeholder="Enter URL" name="url" type="url" value="%v" />
 						<small class="form-text text-muted">Include 'http' or 'https'</small>
 					</div>
 					
-					<button class="btn btn-primary" type='submit'>Go</button>
+					<button class="btn btn-primary" type='submit'>Fling</button>
+					&nbsp;or&nbsp;
+					<button class="btn btn-light" name='clear' value='1' type='submit'>Clear</button>
 				</form>
 			</div>
 		</body>
-		</html>`, cssClass, sbpctx.Parameter)
+		</html>`, cssClass, sbpctx.Parameter, sbpctx.Parameter)
 		log.Println("Responded with home page")
 	}
 

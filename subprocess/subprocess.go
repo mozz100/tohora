@@ -6,55 +6,43 @@ import (
 	"os/exec"
 )
 
-// Context holds together the bits
+// Context contains everything needed - the underlying Cmd and the
+// mechanism to terminate it.
 type Context struct {
-	SubProc   *exec.Cmd
-	Ctx       context.Context
-	Cancel    context.CancelFunc
-	Channel   chan string
+	Command   string
 	Parameter string
+
+	subProc *exec.Cmd
+	ctx     context.Context
+	cancel  context.CancelFunc
 }
 
-// Subprocess returns the channel for sending instructions on
-func Subprocess(cmd string) *Context {
+// GetSubprocess sets up a context and returns it
+func GetSubprocess(cmd string) *Context {
 	sbpctx := Context{}
-	sbpctx.Channel = make(chan string)
-	go controller(cmd, &sbpctx)
-
+	sbpctx.Command = cmd
 	return &sbpctx
 }
 
-func startSubprocess(cmd string, Parameter string, sbpctx *Context) {
-	sbpctx.Ctx, sbpctx.Cancel = context.WithCancel(context.Background())
-	log.Printf("Running '%v %v'", cmd, Parameter)
-	sbpctx.SubProc = exec.CommandContext(sbpctx.Ctx, cmd, Parameter)
+// StartWith starts a subprocess using the specified Command and a Parameter
+func (sbpctx *Context) StartWith(Parameter string) {
+	sbpctx.ctx, sbpctx.cancel = context.WithCancel(context.Background())
+	log.Printf("Running '%v %v'", sbpctx.Command, Parameter)
+	sbpctx.subProc = exec.CommandContext(sbpctx.ctx, sbpctx.Command, Parameter)
 
-	if err := sbpctx.SubProc.Start(); err != nil {
+	if err := sbpctx.subProc.Start(); err != nil {
 		log.Fatal(err)
 	}
+	sbpctx.Parameter = Parameter
 }
 
-func stopSubprocess(sbpctx *Context) {
-	sbpctx.Cancel()
-	sbpctx.SubProc.Wait() // we don't care about subprocess errors for now
-}
-
-func controller(cmd string, sbpctx *Context) {
-	for {
-		action := <-sbpctx.Channel
-		log.Printf("Action: %v", action)
-		sbpctx.Parameter = action
-		switch action {
-		case "":
-			// Stop the subprocess
-			log.Print("Stopping")
-			stopSubprocess(sbpctx)
-			log.Print("Stopped")
-		default:
-			// Start the subprocess
-			log.Print("Starting")
-			startSubprocess(cmd, action, sbpctx)
-			log.Print("Started")
-		}
+// Stop is used to stop the subprocess and set Parameter to ""
+func (sbpctx *Context) Stop() {
+	if sbpctx.subProc == nil {
+		return
 	}
+	log.Println("Stopping")
+	sbpctx.cancel()
+	sbpctx.subProc.Wait() // we don't care about subprocess errors for now
+	sbpctx.Parameter = ""
 }
