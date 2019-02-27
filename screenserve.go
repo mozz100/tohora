@@ -17,8 +17,7 @@ func main() {
 	cmd := os.Args[2]
 	log.Printf("Command is '%v'", cmd)
 
-	sbpctx := subprocess.Context{}
-	ch := *subprocess.Subprocess(cmd, &sbpctx)
+	sbpctx := subprocess.Subprocess(cmd)
 
 	launchHandler := func(w http.ResponseWriter, r *http.Request) {
 		var desiredURL string
@@ -35,16 +34,10 @@ func main() {
 
 		log.Printf("Launch page with desiredURL = '%v'. Slack: %v\n", desiredURL, slackAPI)
 		if sbpctx.SubProc != nil || desiredURL == "" {
-			ch <- subprocess.Instruction{
-				Instruction: "stop",
-				Parameter:   "",
-			}
+			sbpctx.Channel <- ""
 		}
 		if desiredURL != "" {
-			ch <- subprocess.Instruction{
-				Instruction: "start",
-				Parameter:   desiredURL,
-			}
+			sbpctx.Channel <- desiredURL
 		}
 
 		if slackAPI {
@@ -57,7 +50,11 @@ func main() {
 	}
 
 	homeHandler := func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, `
+		cssClass := ""
+		if sbpctx.Parameter == "" {
+			cssClass = "d-none"
+		}
+		fmt.Fprintf(w, `
 		<!doctype html>
 		<html lang="en">
 		<head>
@@ -73,6 +70,7 @@ func main() {
 		<body>
 			<div class="container">
 				<p>Put in a URL to fling it to Wall-e</p>
+				<p class="%v">Currently showing: <code>%v</code></p>
 				<form method='POST' action='/launch/'>
 					<div class="form-group">
 						<input class="form-control" autofocus="autofocus" name="url" type="url" />
@@ -83,7 +81,7 @@ func main() {
 				</form>
 			</div>
 		</body>
-		</html>`)
+		</html>`, cssClass, sbpctx.Parameter)
 		log.Println("Responded with home page")
 	}
 
