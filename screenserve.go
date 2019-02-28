@@ -45,7 +45,12 @@ func main() {
 
 		if slackAPI {
 			log.Println("Responding with plain text 200")
-			fmt.Fprint(w, "OK :tv: :eyes:")
+			if desiredURL == "" {
+				fmt.Fprint(w, "Cleared!")
+			} else {
+				fmt.Fprintf(w, "OK, showing %v :tv: :eyes:", desiredURL)
+			}
+
 		} else {
 			log.Println("Redirecting to home page")
 			http.Redirect(w, r, "/", http.StatusFound)
