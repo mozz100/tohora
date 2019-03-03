@@ -11,6 +11,7 @@ import (
 type Context struct {
 	Command   string
 	Parameter string
+	History   []string
 
 	subProc *exec.Cmd
 	ctx     context.Context
@@ -21,6 +22,7 @@ type Context struct {
 func GetSubprocess(cmd string) *Context {
 	sbpctx := Context{}
 	sbpctx.Command = cmd
+	sbpctx.History = make([]string, 10)
 	return &sbpctx
 }
 
@@ -34,6 +36,10 @@ func (sbpctx *Context) StartWith(Parameter string) {
 		log.Fatal(err)
 	}
 	sbpctx.Parameter = Parameter
+	if Parameter != sbpctx.History[len(sbpctx.History)-1] {
+		sbpctx.History = sbpctx.History[1:]
+		sbpctx.History = append(sbpctx.History, Parameter)
+	}
 }
 
 // Stop is used to stop the subprocess and set Parameter to ""
