@@ -4,8 +4,6 @@ A web UI to run on [balenaDash](https://www.balena.io/blog/make-a-web-frame-with
 
 <img src="screenshots/web-ui.png" width="572" />
 
-To start it
-
 ## How to compile
 
 To compile for raspi:
@@ -24,7 +22,7 @@ chmod +x screenserve
 ```
 
 * `PORT` is the port number.  Use 80 for vanilla http
-* `COMMAND` is the command that the URL is passed to.  On balenaDash, use `WPELauncher` e.g. `./screenserve 80 WPELauncher`.  For manual testing use `sleep` or something equally harmless.
+* `COMMAND` is the command that the URL is passed to.  On balenaDash, use `WPELauncher` e.g. `./screenserve 80 WPELauncher`.  For manual testing/development try-outs use `sleep` or something equally harmless, e.g. `go run screenserve.go 8000 sleep`.
 
 ## Access over the internet
 
@@ -36,4 +34,4 @@ After opening the public URL (see above), add a slack app to allow you to throw 
 
 <img src="screenshots/slack-howto.png" width="631" />
 
-Send an empty URL to clear the screen.
+Post or Slack an empty URL or click the 'Clear' button to clear the screen.
