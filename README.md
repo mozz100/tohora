@@ -35,3 +35,11 @@ After opening the public URL (see above), add a slack app to allow you to throw 
 <img src="screenshots/slack-howto.png" width="631" />
 
 Post or Slack an empty URL or click the 'Clear' button to clear the screen.
+
+
+
+screenserve Copyright (C) 2019 Richard Morrison www.rmorrison.net
+
+    This program comes with ABSOLUTELY NO WARRANTY; for details see `LICENSE`.
+    This is free software, and you are welcome to redistribute it
+    under certain conditions; see `LICENSE` for details.
