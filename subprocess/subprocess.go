@@ -6,6 +6,8 @@ import (
 	"os/exec"
 )
 
+const maxHistory int = 3
+
 // Context contains everything needed - the underlying Cmd and the
 // mechanism to terminate it.
 type Context struct {
@@ -22,7 +24,6 @@ type Context struct {
 func GetSubprocess(cmd string) *Context {
 	sbpctx := Context{}
 	sbpctx.Command = cmd
-	sbpctx.History = make([]string, 10)
 	return &sbpctx
 }
 
@@ -36,9 +37,15 @@ func (sbpctx *Context) StartWith(Parameter string) {
 		log.Fatal(err)
 	}
 	sbpctx.Parameter = Parameter
-	if Parameter != sbpctx.History[len(sbpctx.History)-1] {
-		sbpctx.History = sbpctx.History[1:]
-		sbpctx.History = append(sbpctx.History, Parameter)
+
+	if len(sbpctx.History) == 0 {
+		sbpctx.History = []string{Parameter}
+	}
+	if Parameter != sbpctx.History[0] {
+		sbpctx.History = append([]string{Parameter}, sbpctx.History...)
+	}
+	if len(sbpctx.History) > maxHistory {
+		sbpctx.History = sbpctx.History[:maxHistory]
 	}
 }
 
