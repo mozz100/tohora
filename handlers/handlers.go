@@ -40,10 +40,10 @@ func LaunchHandler(sbpctx *subprocess.Context) func(http.ResponseWriter, *http.R
 
 		log.Printf("Launch page with desiredURL = '%v'. Slack: %v\n", desiredURL, slackAPI)
 		if sbpctx.Parameter != "" || desiredURL == "" {
-			sbpctx.Stop()
+			defer sbpctx.Stop()
 		}
 		if desiredURL != "" {
-			sbpctx.StartWith(desiredURL)
+			defer sbpctx.StartWith(desiredURL)
 		}
 
 		if slackAPI {
