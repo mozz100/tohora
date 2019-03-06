@@ -1,4 +1,4 @@
-# Screenserve
+# Tohora
 
 A web UI to run on [balenaDash](https://www.balena.io/blog/make-a-web-frame-with-raspberry-pi-in-30-minutes/).  Make `post` requests with a URL parameter to have the server launch a subprocess and show the submitted URL on screen.
 
@@ -17,12 +17,12 @@ env GOOS=linux GOARCH=arm GOARM=5 go build
 Copy the binary and `templates` directory onto the raspi and run it:
 
 ```
-chmod +x screenserve
-./screenserve PORT COMMAND
+chmod +x tohora
+./tohora PORT COMMAND
 ```
 
 * `PORT` is the port number.  Use 80 for vanilla http
-* `COMMAND` is the command that the URL is passed to.  On balenaDash, use `WPELauncher` e.g. `./screenserve 80 WPELauncher`.  For manual testing/development try-outs use `sleep` or something equally harmless, e.g. `go run screenserve.go 8000 sleep`.
+* `COMMAND` is the command that the URL is passed to.  On balenaDash, use `WPELauncher` e.g. `./tohora 80 WPELauncher`.  For manual testing/development try-outs use `sleep` or something equally harmless, e.g. `go run tohora.go 8000 sleep`.
 
 ## Access over the internet
 
@@ -38,7 +38,7 @@ Post or Slack an empty URL or click the 'Clear' button to clear the screen.
 
 
 
-screenserve Copyright (C) 2019 Richard Morrison www.rmorrison.net
+tohora Copyright (C) 2019 Richard Morrison www.rmorrison.net
 
     This program comes with ABSOLUTELY NO WARRANTY; for details see `LICENSE`.
     This is free software, and you are welcome to redistribute it

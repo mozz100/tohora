@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	subprocess "github.com/mozz100/screenserve/subprocess"
+	subprocess "github.com/mozz100/tohora/subprocess"
 )
 
 // HomeHandler handles GET requests for /

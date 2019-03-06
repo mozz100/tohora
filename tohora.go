@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/mozz100/screenserve/handlers"
-	"github.com/mozz100/screenserve/subprocess"
+	"github.com/mozz100/tohora/handlers"
+	"github.com/mozz100/tohora/subprocess"
 )
 
 func main() {
