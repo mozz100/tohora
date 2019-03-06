@@ -2,7 +2,7 @@
 
 A web UI to run on [balenaDash](https://www.balena.io/blog/make-a-web-frame-with-raspberry-pi-in-30-minutes/).  Make `post` requests with a URL parameter to have the server launch a subprocess and show the submitted URL on screen.
 
-<img src="screenshots/web-ui.png" width="572" />
+<img src="screenshots/web-ui.png" width="711" />
 
 ## How to compile
 
