@@ -4,6 +4,12 @@ A web UI to run on [balenaDash](https://www.balena.io/blog/make-a-web-frame-with
 
 <img src="screenshots/web-ui.png" width="711" />
 
+I wrote a [blog post](https://www.rmorrison.net/mnemozzyne/2019/03/07/tohora-instant-control-balenadash/) about the project.
+
+Quick video demo below.  The "Hello World" page is our base `WPE_URL`:
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/UPdwW90czG4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## How to compile
 
 To compile for raspi:
