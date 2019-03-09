@@ -6,9 +6,10 @@ A web UI to run on [balenaDash](https://www.balena.io/blog/make-a-web-frame-with
 
 I wrote a [blog post](https://www.rmorrison.net/mnemozzyne/2019/03/07/tohora-instant-control-balenadash/) about the project.
 
-Quick video demo below.  The "Hello World" page is our base `WPE_URL`:
+Quick video demo below (click to play on YouTube).  The "Hello World" page is our base `WPE_URL`:
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/UPdwW90czG4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+[![Tohora demo](https://img.youtube.com/vi/UPdwW90czG4/0.jpg)](https://www.youtube.com/watch?v=UPdwW90czG4)
 
 ## How to compile
 
