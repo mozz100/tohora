@@ -12,10 +12,10 @@
 </head>
 <body>
     <div class="container mt-3">
-        <p class='{{ if eq .Parameter "" }}d-none{{ end }}'>Currently showing: <code>{{ .Parameter }}</code></p>
+        <p class='{{ if eq .Subprocess.Parameter "" }}d-none{{ end }}'>Currently showing: <code>{{ .Subprocess.Parameter }}</code></p>
         <form method='POST' action='/launch/'>
             <div class="form-group">
-                <input class="form-control" autofocus="autofocus" placeholder="Enter URL" name="url" type="url" value="{{ .Parameter }}" />
+                <input class="form-control" autofocus="autofocus" placeholder="Enter URL" id="url" name="url" type="url" value="{{ .Subprocess.Parameter }}" />
                 <small class="form-text text-muted">Include 'http' or 'https'</small>
             </div>
             
@@ -23,11 +23,12 @@
             &nbsp;or&nbsp;
             <button class="btn btn-secondary" name='clear' value='1' type='submit'>Clear screen</button>
         </form>
-        {{ if len .History }}
-        <p class="mt-3">Recent:</p>
-        <ul>{{ range .History }}
+
+        {{ if len .Subprocess.History }}
+        <p class="mt-3">Recent (click to show again):</p>
+        <ul>{{ range .Subprocess.History }}
             {{ if . }}
-            <li><code>{{ . }}</code></li>
+            <li><a class="autofill" href="{{ . }}"><code>{{ . }}</code></a></li>
             {{ end }}
             {{ end }}
         </ul>
@@ -36,5 +37,16 @@
             <p class="text-right"><small>For questions, bugs and suggestions, please use <a href="https://github.com/mozz100/tohora/issues">Github</a>.</small></p>
         </footer>
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script>
+        $(function() {
+            $('.autofill').on('click', function(e) {
+                e.preventDefault();
+                var href = $(this).attr('href');
+                $("#url").val(href);
+                $("form").submit();
+            })
+        });
+    </script>
 </body>
 </html>

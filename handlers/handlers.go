@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	subprocess "github.com/mozz100/tohora/subprocess"
+	"github.com/mozz100/tohora/subprocess"
 )
 
 // HomeHandler handles GET requests for /
@@ -14,7 +14,10 @@ func HomeHandler(sbpctx *subprocess.Context) func(http.ResponseWriter, *http.Req
 	indexTmpl := template.Must(template.ParseFiles("templates/index.html"))
 
 	homeHandler := func(w http.ResponseWriter, r *http.Request) {
-		indexTmpl.Execute(w, sbpctx)
+		data := map[string]interface{}{
+			"Subprocess": sbpctx,
+		}
+		indexTmpl.Execute(w, data)
 		log.Println("Responded with home page")
 	}
 	return homeHandler
