@@ -5,7 +5,8 @@
 # $ git push origin v0.1.0
 
 # Then:
-# $ goreleaser
+# $ source secrets.sourceme
+# $ goreleaser --rm-dist
 
 before:
   hooks: []
