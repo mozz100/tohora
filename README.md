@@ -4,7 +4,8 @@ A web UI to run on [balenaDash](https://www.balena.io/blog/make-a-web-frame-with
 
 <img src="screenshots/web-ui.png" width="711" />
 
-I wrote a [blog post](https://www.rmorrison.net/mnemozzyne/2019/03/07/tohora-instant-control-balenadash/) about the project.
+* I wrote a [blog post](https://www.rmorrison.net/mnemozzyne/2019/03/07/tohora-instant-control-balenadash/) about the project.
+* See also [resin.io's excellent instructions for using this system](https://www.balena.io/blog/control-your-balenadash-display-with-a-web-browser-http-api/)
 
 Quick video demo below (click to play on YouTube).  The "Hello World" page is our base `WPE_URL`:
 
@@ -42,6 +43,19 @@ After opening the public URL (see above), add a slack app to allow you to throw 
 <img src="screenshots/slack-howto.png" width="631" />
 
 Post or Slack an empty URL or click the 'Clear' button to clear the screen.
+
+## Using from scripts
+
+Make changes to your display by sending POST requests with a `url` parameter to `/launch/` from any other app/language that can communicate over HTTP.
+
+Here's an example with `curl`:
+
+```
+curl --data-urlencode "url=https://www.google.com/?q=tohora&a=b" http://<Device IP address>:8080/launch/
+```
+
+Note that URL encoding (aka percent encoding) is necessary here, otherwise the ampersand is interpreted as a separation character and `&a=b` isn't included in the value of `url`.  `curl -d` doesn't do exactly the same thing.  Be careful to think about encoding if you are calling from other languages too. 
+
 
 
 
